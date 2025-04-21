@@ -6,6 +6,8 @@ export const getVenues = async (params?: VenueFilter) => {
     return response.data;
 };
 
+export const getVenueList = getVenues;
+
 export const getVenueById = async (id: number) => {
     const response = await api.get(`/venues/${id}`);
     return response.data;

@@ -1,28 +1,56 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+    networks:
+      - ticket_booking_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ticket_booking
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123456
+    depends_on:
+      - postgres
+    networks:
+      - ticket_booking_network
+
   postgres:
     image: postgres:16
-    container_name: ticket_booking_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: ticket_booking
     ports:
       - "5433:5432"
+    environment:
+      - POSTGRES_DB=ticket_booking
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - ticket_booking_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+
+volumes:
+  postgres_data:
 
 networks:
   ticket_booking_network:
-    driver: bridge
-
-volumes:
-  postgres_data: 
+    driver: bridge 
