@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -19,6 +22,24 @@ public class VenueController extends BaseController {
 
     @Autowired
     private VenueService venueService;
+
+    @GetMapping
+    @Operation(summary = "取得場地列表（分頁）")
+    public ResponseEntity<Map<String, Object>> getVenues(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Integer capacity,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<VenueDTO> venues = venueService.getVenues(name, minPrice, maxPrice, capacity, pageable);
+            return success(venues);
+        } catch (Exception e) {
+            return error(e.getMessage());
+        }
+    }
 
     @PostMapping
     @Operation(summary = "創建場地")
@@ -37,17 +58,6 @@ public class VenueController extends BaseController {
         try {
             VenueDTO venue = venueService.getVenueById(id);
             return success(venue);
-        } catch (Exception e) {
-            return error(e.getMessage());
-        }
-    }
-
-    @GetMapping
-    @Operation(summary = "取得所有場地")
-    public ResponseEntity<Map<String, Object>> getAllVenues() {
-        try {
-            List<VenueDTO> venues = venueService.getAllVenues();
-            return success(venues);
         } catch (Exception e) {
             return error(e.getMessage());
         }

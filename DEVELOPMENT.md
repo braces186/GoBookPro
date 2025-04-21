@@ -33,13 +33,15 @@ docker-compose up -d
 ### 開發環境（使用 H2 內存數據庫）
 ```bash
 cd backend
-mvn spring-boot:run "-Dspring.profiles.active=dev"
+mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
+如果是用jar啟動服務，才會使用 spring.profiles.active=dev
 ```
 
 ### 生產環境（使用 PostgreSQL）
 ```bash
 cd backend
-mvn spring-boot:run "-Dspring.profiles.active=prod"
+mvn spring-boot:run "-Dspring-boot.run.profiles=prod"
+如果是用jar啟動服務，才會使用 spring.profiles.active=prod
 ```
 
 ## 訪問應用程序

@@ -9,6 +9,9 @@ import com.ticketbooking.repository.UserRepository;
 import com.ticketbooking.service.VenueService;
 import com.ticketbooking.util.VenueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,27 @@ public class VenueServiceImpl implements VenueService {
 
     @Autowired
     private VenueMapper venueMapper;
+
+    @Override
+    public Page<VenueDTO> getVenues(String name, Double minPrice, Double maxPrice, Integer capacity, Pageable pageable) {
+        Specification<Venue> spec = (root, query, cb) -> {
+            if (name != null && !name.isEmpty()) {
+                query.where(cb.like(root.get("name"), "%" + name + "%"));
+            }
+            if (minPrice != null) {
+                query.where(cb.greaterThanOrEqualTo(root.get("pricePerHour"), minPrice));
+            }
+            if (maxPrice != null) {
+                query.where(cb.lessThanOrEqualTo(root.get("pricePerHour"), maxPrice));
+            }
+            if (capacity != null) {
+                query.where(cb.greaterThanOrEqualTo(root.get("capacity"), capacity));
+            }
+            return query.getRestriction();
+        };
+
+        return venueRepository.findAll(spec, pageable).map(venueMapper::toDTO);
+    }
 
     @Override
     public VenueDTO createVenue(Long merchantId, CreateVenueRequest request) {

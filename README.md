@@ -13,7 +13,7 @@
 ### 階段一：MVP 基礎功能（單體架構）
 - **後端技術**
   - Java 17+
-  - Spring Boot 3.4.4
+  - Spring Boot 3.2.3
   - PostgreSQL
   - Spring Security + JWT
   - Swagger / OpenAPI

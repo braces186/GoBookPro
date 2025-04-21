@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         // 計算總價
         Duration duration = Duration.between(request.getStartTime(), request.getEndTime());
         long hours = duration.toHours();
-        BigDecimal totalPrice = venue.getPricePerHour().multiply(BigDecimal.valueOf(hours));
+        double totalPrice = venue.getPricePerHour() * hours;
 
         Booking booking = new Booking();
         booking.setUser(user);
